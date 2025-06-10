@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/my-first-collections",
+      "handler": "my-first-collection.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/my-first-collections/count",
+      "handler": "my-first-collection.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/my-first-collections/:id",
+      "handler": "my-first-collection.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/my-first-collections",
+      "handler": "my-first-collection.create",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/my-first-collections/:id",
+      "handler": "my-first-collection.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/my-first-collections/:id",
+      "handler": "my-first-collection.delete",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}

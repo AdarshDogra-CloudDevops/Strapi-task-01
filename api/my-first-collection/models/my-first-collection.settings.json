@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "my_first_collections",
+  "info": {
+    "name": "My first collection",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Myfirstcollection": {
+      "type": "text"
+    },
+    "Numberfield": {
+      "type": "biginteger"
+    }
+  }
+}
