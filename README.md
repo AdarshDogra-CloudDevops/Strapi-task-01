@@ -1,89 +1,78 @@
-# 🚀 Strapi Task 01 – DevOps Internship @ PearlThoughts
+# 🚀 Dockerized Strapi Setup with PostgreSQL and Nginx
 
-## 📌 Objective
-
-> Clone the Strapi repository, run it locally, explore the folder structure, start the admin panel, create a sample content type, and push the setup to GitHub with documentation.
+This project sets up a Dockerized environment for Strapi with PostgreSQL and Nginx. The goal is to expose the Strapi Admin Dashboard on port 80 using a reverse proxy.
 
 ---
 
-## 📁 Project Overview
+## 🧱 Overview
 
-This project demonstrates a complete local setup of **Strapi v3**, a Node.js-based headless CMS. The goal was to:
-- Set up Strapi manually on a cloud-based Ubuntu machine
-- Understand its internal structure and workflow
-- Run the Strapi admin panel
-- Create a sample content type
-- Host the full working codebase on GitHub with documentation
+- **Strapi**: Headless CMS running in a Docker container
+- **PostgreSQL**: Database service container
+- **Nginx**: Reverse proxy container to expose Strapi on `http://localhost`
+- All services run on a shared **Docker user-defined network**
 
 ---
 
-## ⚙️ Tools & Environment Used
+## ⚙️ Setup Instructions
 
-| Tool | Version |
-|------|---------|
-| **Cloud Provider** | AWS EC2 (Ubuntu 22.04 - Free Tier t2.micro) |
-| **Node.js** | v14.21.3 |
-| **Yarn** | 1.22.22 |
-| **Strapi** | v3.6.11 (manual install via `npx`) |
-| **Git** | Version-controlled via GitHub |
-| **Browser Access** | EC2 Public IP on Port 1337 |
+### 1. Create Docker Network
 
----
+Create a user-defined network for communication between containers:
 
-## 🛠️ Installation & Setup Steps
+docker network create strapi-net
 
-### ✅ 1. Launch EC2 (Free Tier)
-- Ubuntu 22.04 instance with public IP
-- Open inbound port **1337** in the EC2 Security Group
+2. Prepare Files
+Ensure your project contains:
 
-### ✅ 2. Install Required Software
+Dockerfile for building the Strapi app
 
-```bash
-sudo apt update && sudo apt upgrade -y
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt install -y nodejs build-essential git yarn
+docker-compose.yml defining services for Strapi, PostgreSQL, and Nginx
 
-✅ 3. Create Strapi v3 App
+nginx.conf to configure Nginx as a reverse proxy
 
-npx create-strapi-app@3.6.11 Strapi-task-01 --quickstart
+Each file is set up to ensure the services are connected over the same network and Strapi is accessible on port 80.
 
---quickstart automatically installs dependencies and starts the server.
+3. Start Containers
 
-✅ 4. Access the Admin Panel
-Open browser:
-http://<Your-EC2-Public-IP>:1337/admin
+Run the stack with:
 
-Register the first admin user (Strapi UI will prompt)
+docker-compose up --build -d
 
+This will:
 
- Sample Content Type Created
-In the Strapi Admin Panel:
+Start PostgreSQL with required environment variables
 
-Created a Content Type: My first collection
+Build and start the Strapi app
 
-📁 Project Folder Structure
+Launch Nginx and route traffic from port 80 to Strapi (port 1337 internally)
 
-Strapi-task-01/
-├── api/                 # APIs for content types
-├── config/              # Configuration for server, database, etc.
-├── public/              # Static files
-├── admin/               # Admin panel frontend
-├── src/                 # Source files
-├── package.json         # Node project config
-├── yarn.lock            # Dependency lock
-└── README.md            # Documentation
+4. Access Strapi
+
+Local system: Visit http://localhost
+
+EC2 instance: Use public IP → http://<your-ec2-ip>
 
 
-🚀 How to Run Again
-# From project root
-cd Strapi-task-01
-yarn develop
+✅ Verification
 
-Visit: http://<EC2-IP>:1337/admin
+All containers should be running:
 
-✅ AWS Free Tier Confirmed
-EC2: t2.micro instance (Free Tier eligible)
+docker ps
 
-No RDS, no load balancer, no extra paid resources used
+Strapi should be accessible from a browser.
+
+Logs can be viewed with: 
+
+docker logs strapi-app
+
+docker logs strapi-nginx
+
+📌 Notes
+
+Credentials like DB user/password are configured via environment variables in docker-compose.yml
+
+All services share the same custom network: strapi-net
+
+Nginx proxy ensures access through port 80, hiding the internal Strapi port
 
 
