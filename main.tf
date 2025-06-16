@@ -1,29 +1,15 @@
 provider "aws" {
-  region = var.region
+  region = "eu-north-1"
 }
 
-resource "aws_key_pair" "strapi_key" {
-  key_name   = var.key_name
-  public_key = file(var.public_key_path)
+resource "aws_key_pair" "dev_key" {
+  key_name   = "dev-key"
+  public_key = file("~/.ssh/id_rsa.pub")
 }
 
 resource "aws_security_group" "strapi_sg" {
-  name        = "strapi-sg"
+  name        = "strapi-sg-N"
   description = "Allow SSH and Strapi ports"
-
-  ingress {
-    from_port   = 1337
-    to_port     = 1337
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     from_port   = 22
@@ -32,34 +18,48 @@ resource "aws_security_group" "strapi_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 1337
+    to_port     = 1337
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Consider using your IP for security
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "StrapiSecurityGroup"
+  }
 }
 
 resource "aws_instance" "strapi_ec2" {
-  ami                         = "ami-042b4708b1d05f512"  # Ubuntu 22.04 LTS (eu-north-1)
-  instance_type               = var.instance_type
-  key_name                    = aws_key_pair.strapi_key.key_name
-  vpc_security_group_ids      = [aws_security_group.strapi_sg.id]
+  ami                         = "ami-05fcfb9614772f051"
+  instance_type               = "t3.medium"
+  key_name                    = aws_key_pair.dev_key.key_name
   associate_public_ip_address = true
 
-  # ✅ Bigger disk size
-  root_block_device {
-    volume_size = 20
-    volume_type = "gp2"
-  }
+  vpc_security_group_ids = [aws_security_group.strapi_sg.id]
+
+  user_data = file("${path.module}/user-data.sh")
 
   tags = {
-    Name = "Strapi-Ubuntu"
+    Name = "StrapiAppServer"
   }
-}
 
-output "instance_public_ip" {
-  description = "Public IP of the EC2 instance running Strapi"
-  value       = aws_instance.strapi_ec2.public_ip
+  provisioner "remote-exec" {
+    inline = ["echo EC2 with Amazon Linux is ready!"]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.public_ip
+    }
+  }
 }
 
