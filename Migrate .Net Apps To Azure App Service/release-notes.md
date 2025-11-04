@@ -15,10 +15,10 @@ This Page contains detailed notes about the latest updates and modifications mad
 
  `Email Support: cloudlabs-support@spektrasystems.com`
 
+## Release Notes
+
 <details>
   <summary>2025-11-04</summary>
-
-## Release Notes
 
 ## Release Date: 2025-11-04
 
